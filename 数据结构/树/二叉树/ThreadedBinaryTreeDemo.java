@@ -35,8 +35,8 @@ public class ThreadedBinaryTreeDemo
 		root.setRight(hero3);
 		hero2.setLeft(hero4);
 		hero2.setRight(hero5);
-		hero3.setLeft(hero6);
-		//hero3.setRight(hero6);
+		//hero3.setLeft(hero6);
+		hero3.setRight(hero6);
 		
 		/*
 		//前序线索化：
@@ -76,21 +76,20 @@ public class ThreadedBinaryTreeDemo
 		System.out.println("节点6的左节点为：" + hero3.getLeft());
 		System.out.println("节点6的右节点为：" + hero3.getRight());
 		*/
-		tree.postOrder();
+		//tree.postOrder();
 
 		//前序线索化：
 		//tree.threadPre();
 		//tree.threadPreTraverse();
 		//中序线索化：
-		//tree.threadInfix();
-		//tree.threadInfixTraverse();
+		tree.threadInfix();
+		tree.threadInfixTraverse();
 		//后序线索化：
-		tree.threadPost();
-		tree.threadPostTraverse();
+		//tree.threadPost();
 	}
 }
 
-//二叉树
+//线索化二叉树
 class ThreadedBinaryTree
 {
 	private HeroNode root;
@@ -129,7 +128,10 @@ class ThreadedBinaryTree
 		}
 
 		//前序顺序 当前节点 -> 左节点遍历 -> 右节点遍历
-
+		
+		/*
+		处理当前节点
+		*/
 		//当前节点的左边，即处理前驱节点
 		if (node.getLeft() == null)
 		{
@@ -150,6 +152,9 @@ class ThreadedBinaryTree
 		//更新pre
 		pre = node;
 		
+		/*
+		遍历左节点
+		*/
 		//不能让 左节点 已经连接前驱节点还是参与遍历
 		if (node.getLeftStatus())
 		{
@@ -157,6 +162,9 @@ class ThreadedBinaryTree
 			threadPre(node.getLeft());
 		}
 		
+		/*
+		遍历右节点
+		*/
 		//不能让 右节点 已经连接后继节点还是参与遍历
 		if (node.getRightStatus())
 		{
@@ -189,9 +197,14 @@ class ThreadedBinaryTree
 
 		//中序顺序 左节点遍历 -> 当前节点 -> 右节点遍历
 		
-		//左节点遍历
+		/*
+		左节点遍历
+		*/
 		threadInfix(node.getLeft());
-
+		
+		/*
+		处理当前节点
+		*/
 		//当前节点的左边，即处理前驱节点
 		if (node.getLeft() == null)
 		{
@@ -212,7 +225,9 @@ class ThreadedBinaryTree
 		//更新pre
 		pre = node;
 
-		//右节点遍历
+		/*
+		右节点遍历
+		*/
 		threadInfix(node.getRight());
 	}
 	//后序线索化
@@ -240,11 +255,18 @@ class ThreadedBinaryTree
 
 		//中序顺序 左节点遍历 -> 右节点遍历 -> 当前节点
 		
-		//左节点遍历
+		/*
+		左节点遍历
+		*/
 		threadPost(node.getLeft());
-		//右节点遍历
+		/*
+		右节点遍历
+		*/
 		threadPost(node.getRight());
 
+		/*
+		处理当前节点
+		*/
 		//当前节点的左边，即处理前驱节点
 		if (node.getLeft() == null)
 		{
@@ -279,8 +301,14 @@ class ThreadedBinaryTree
 			while (node != null)
 			{
 				//如果是前序遍历，先从当前节点开始输出当前节点
+				/*
+				打印当前节点
+				*/
 				System.out.println(node);
-
+				
+				/*
+				处理左边的节点,这里左边节点只需要考虑正常子节点，如果是前驱节点不去处理即可
+				*/
 				//左边节点如果不是前驱节点
 				if (node.getLeftStatus())
 				{
@@ -288,7 +316,7 @@ class ThreadedBinaryTree
 					continue;
 				}
 
-				//右边节点如果是后继节点
+				//右边节点如果是后继节点，则可以一直遍历输出，因为后继节点必定是指向下一个遍历节点的
 				while (!node.getRightStatus())
 				{
 					node = node.getRight();
@@ -296,9 +324,9 @@ class ThreadedBinaryTree
 				}
 				
 				//更新节点
-				//这里是排除 左节点为空，只有右节点的情况
-				//如果到了右侧节点不是线性结点的时候，按照遍历  中 左 右 的顺序，当前节点的下一个为左子节点
-				//所以更新应该是更新成左侧的节点
+				//这里是排除 左节点为空（指向了前驱节点），只有右节点的情况（可以看出上面流程 没有考虑到右子节点是正常节点怎么办，相当于逻辑还漏了一块）
+				//如果执行到这一步，说明当前节点的左子节点指向了前驱节点，右子节点也不是后继节点，则说明右子节点是正常节点，且左子节点没东西
+				//所以下一个节点就是当前节点的右子节点了
 				node = node.getRight();
 			}
 			System.out.println("前序线索化二叉树遍历成功！");
@@ -315,28 +343,40 @@ class ThreadedBinaryTree
 	{
 		if (this.root != null)
 		{
-			//中序遍历从最左边开始，所以首先找到最左边的元素，
 			HeroNode node = root;
 			while (node != null)
 			{
-				//先打印这个节点
-				System.out.println(node);
-				//一直找到节点左边是前驱节点的节点
+				//中序遍历从最左边开始，所以首先找到最左边的元素，
+
+				/*
+				处理左边的节点,这里对于每一个节点 首先得找到最左边的子节点开始遍历
+				*/
+				//一直找到 节点左边是前驱节点的节点 为止
 				while (node.getLeftStatus())
 				{
 					node = node.getLeft();
 					//这里退出时，就应该是最左边的节点，即最开始的遍历节点
+					continue;
 				}
 
+				/*
+				打印当前节点
+				*/
+				System.out.println(node);
+
+				/*
+				处理右边节点，其中右边比较特殊，如果是后继节点，可以一直输出，否则换成右子节点继续循环
+				*/
 				//然后尝试按照线索输出节点
 				while (! node.getRightStatus())
 				{
-					//如果节点右侧是后继节点
+					//打印后继节点
 					System.out.println(node.getRight());
 					//更新节点
 					node = node.getRight();
 				}
-				//这一步 根据前面的判断结果 左侧节点是空或者前驱节点，右侧节点是子树
+
+				//能执行到这一步 根据前面的判断结果 右侧节点是子树，继续迭代即可
 				node = node.getRight();	
 			}
 			System.out.println("中序线索化二叉树遍历成功！");
@@ -346,57 +386,6 @@ class ThreadedBinaryTree
 		{
 			System.out.println("中序线索化二叉树遍历失败！");
 			return false;
-		}
-	}
-	//后序线索化二叉树的遍历方法
-	public boolean threadPostTraverse()
-	{
-		if (this.root != null)
-		{
-			threadPostTraverse(root);
-			System.out.println("后序线索化二叉树遍历成功！");
-			return true;
-		}
-		else 
-		{
-			System.out.println("后序线索化二叉树遍历失败！");
-			return false;
-		}
-	}
-	private void threadPostTraverse(HeroNode node)
-	{
-		//后序遍历从最左边开始，所以首先找到最左边的元素，
-		HeroNode father = null;
-	
-		if (node.getLeftStatus())
-		{
-			father = node;
-			threadPostTraverse(node.getLeft());	//一直找到节点左边是前驱节点的节点
-		}
-
-		//先打印这个节点
-		System.out.println(node);
-		
-		//然后尝试按照线索输出节点
-		//只有位于最底层的节点才会走到循环里面
-		while (! node.getRightStatus())
-		{
-			//如果节点右侧是后继节点
-			System.out.println(node.getRight());
-			//更新节点
-			node = node.getRight();
-		}
-		//跳出while循环后，会返回到父节点（画图理解）
-		
-		if (node == father)
-		{
-			//这里从while出来后是相等的
-			return;
-		}
-
-		if (father != null)
-		{
-			node = father.getRight();
 		}
 	}
 
