@@ -1,10 +1,12 @@
 import java.util.*;
+import java.io.*;
 
 public class HuffmanCodeDemo
 {
 	public static void main(String[] args) 
 	{
-		String data = "i like like like java do you like a java";
+		/*
+		String data = "i like like like java do you like a java hjauncakjkj jakljfklsajflhjdaoifhjlk  kjalkjfl ajflj lkahl ljl j";
 		
 		System.out.println("原始数据：");
 		System.out.println(data);
@@ -18,6 +20,16 @@ public class HuffmanCodeDemo
 
 		System.out.println("解码后的：");
 		System.out.println(new String(result));
+		*/
+		
+
+		//测试压缩文件
+		HuffmanCode.zipFile("E://javafile//999.bmp", "E://javafile//test.zip");
+		System.out.println("压缩成功");
+
+		//测试解压缩文件
+		HuffmanCode.unZipFile("E://javafile//test.zip", "E://javafile//huanyuan.bmp");
+		System.out.println("解压缩成功");
 	}
 }
 
@@ -29,6 +41,90 @@ class HuffmanCode
 	public static Map<Byte, String> getBook()
 	{
 		return book;
+	}
+
+	public static void zipFile(String srcFile, String dstFile)
+	{
+		InputStream fis = null;
+		OutputStream fos = null;
+		ObjectOutputStream oos = null;
+		try
+		{
+			//建立对应的输入输出流
+			fis = new FileInputStream(srcFile);
+			fos = new FileOutputStream(dstFile);
+			oos = new ObjectOutputStream(fos);
+
+			byte[] bytes = new byte[fis.available()];
+
+			//读取
+			fis.read(bytes);
+
+			//开始压缩
+			byte[] result = huffmanZip(bytes);
+
+			//保存文件
+			oos.writeObject(result);
+			oos.writeObject(book);
+		}
+		catch (Exception w)
+		{
+			w.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				fis.close();
+				fos.close();
+				oos.close();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void unZipFile(String srcFile, String dstFile)
+	{
+		InputStream fis = null;
+		OutputStream fos = null;
+		ObjectInputStream ois = null;
+		try
+		{
+			//建立对应的输入输出流
+			fis = new FileInputStream(srcFile);
+			fos = new FileOutputStream(dstFile);
+			ois = new ObjectInputStream(fis);
+
+			byte[] bytes = (byte[])ois.readObject();
+
+			Map<Byte, String> codeBook = (Map<Byte, String>)ois.readObject();
+
+			//开始解压缩
+			byte[] result = huffmanUnZip(bytes, codeBook);
+
+			//保存文件
+			fos.write(result);
+		}
+		catch (Exception w)
+		{
+			w.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				fis.close();
+				fos.close();
+				ois.close();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	//根据输入的字符串得到编码后的字符数组
@@ -57,7 +153,7 @@ class HuffmanCode
 		
 		//译码后的二进制
 		System.out.println("接收到的二进制:");
-		System.out.println(builder);
+		//System.out.println(builder);
 
 		//将密码本反转，便于译码
 		Map<String, Byte> decodeBook = new HashMap<>();
@@ -73,20 +169,18 @@ class HuffmanCode
 		for (int i = 0; i < builder.length();)
 		{
 			//保存往后读了多少位
-			int count = 0;
-			//保存当前读取到的10码
-			//StringBuilder buffer = new StringBuilder();
+			int count = 1;
 			//在解码密码本读到的内容
 			Byte b = null;
 			while (b == null)
 			{
-				count++;
 				//尝试读取
 				b = decodeBook.get(builder.substring(i, i + count));
+				count++;
 			}
 			//读取到了对应的字节
 			list.add(b);
-			i = i + count;
+			i = i + count - 1;
 		}
 		//将链表转换成数组
 		byte[] result = new byte[list.size()];
@@ -188,7 +282,7 @@ class HuffmanCode
 			stringBuilder.append(codeBook.get(b));
 		}
 
-		System.out.println(stringBuilder);
+		//System.out.println(stringBuilder);
 
 		//然后求出需要创建的返回的比特数组的大小
 		int length = stringBuilder.length() / 8 + ( stringBuilder.length() % 8 == 0 ? 0 : 1);
