@@ -1,4 +1,4 @@
-public class SingleTon_HungryMan_StaticYield
+public class SingleTon_StaticInnerClass
 {
 	public static void main(String[] args)
     {
@@ -17,11 +17,16 @@ public class SingleTon_HungryMan_StaticYield
     }
 }
 
-//单例模式的饿汉式实现之一---静态常量
+//静态内部类
 class SingleTon
 {
-    //通过设置静态常量，可以实现该类只有一个对象
-    private final static SingleTon singleTon = new SingleTon();
+    //静态内部类
+    private static final class SingleTonInstance
+    {
+        //内部必须是静态成员变量，保证唯一性
+        //静态内部类用到的时候才会加载，且加载的时候
+        private static final SingleTon INSTANCE = new SingleTon();
+    }
 
     //构造器私有化，放置new新的对象
     private SingleTon()
@@ -30,6 +35,6 @@ class SingleTon
     //通过一个静态方法，来返回独有的对象
     public static SingleTon getInstance()
     {
-        return singleTon;
+        return SingleTonInstance.INSTANCE;
     }
 }

@@ -1,4 +1,4 @@
-public class SingleTon_HungryMan_StaticYield
+public class SingleTon_HungryMan_StaticCode
 {
 	public static void main(String[] args)
     {
@@ -21,11 +21,18 @@ public class SingleTon_HungryMan_StaticYield
 class SingleTon
 {
     //通过设置静态常量，可以实现该类只有一个对象
-    private final static SingleTon singleTon = new SingleTon();
+    private static SingleTon singleTon;
+
+	//静态代码块初始化
+	static{
+		 singleTon = new SingleTon();
+	}
 
     //构造器私有化，放置new新的对象
     private SingleTon()
     {}
+
+
 
     //通过一个静态方法，来返回独有的对象
     public static SingleTon getInstance()

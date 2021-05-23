@@ -1,4 +1,4 @@
-public class SingleTon_HungryMan_StaticYield
+public class SingleTon_LazyMan_ThreadSafe
 {
 	public static void main(String[] args)
     {
@@ -17,19 +17,21 @@ public class SingleTon_HungryMan_StaticYield
     }
 }
 
-//单例模式的饿汉式实现之一---静态常量
+//单例模式的懒汉式实现之一--- 线程安全的
 class SingleTon
 {
     //通过设置静态常量，可以实现该类只有一个对象
-    private final static SingleTon singleTon = new SingleTon();
+    private static SingleTon instance;
 
     //构造器私有化，放置new新的对象
     private SingleTon()
     {}
 
-    //通过一个静态方法，来返回独有的对象
-    public static SingleTon getInstance()
+    //通过一个静态方法，来返回独有的对象，加入了线程锁，保证同步安全 
+    public static synchronized SingleTon getInstance()
     {
-        return singleTon;
+        if (instance == null)
+            instance = new SingleTon();
+        return instance;
     }
 }
