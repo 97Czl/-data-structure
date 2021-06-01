@@ -42,7 +42,7 @@ public class CoinChange
 //                 //如果i == 1，计算能不能整除即可
 //                 if (i == 0)
 //                 {
-//                     dp[j] = (j % coins[i]) ^ 1;
+//                     dp[j] = (j % coins[i] == 0) ? 1 : 0;
 //                 }
 //                 else
 //                 {
@@ -81,7 +81,7 @@ public class CoinChange
                 //如果i == 1，计算能不能整除即可
                 if (i == 0)
                 {
-                    dp[j] = (j % coins[i]) ^ 1;
+                    dp[j] = (j % coins[i] == 0) ? 1 : 0;
                 }
                 else
                 {
